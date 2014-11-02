@@ -63,7 +63,7 @@ request({
     input_vt.setData( body );
     input_vt.parse();
     var output_vt = new mapnik.VectorTile(z,x,y);
-    output_vt.composite([input_vt]);
+    output_vt.composite([input_vt], {buffer_size:0} );
     output_vt.parse();
     //console.log(output_vt);
     try{
