@@ -57,7 +57,7 @@ request({
   if (err) throw err; 
   zlib.gunzip(zbody, function(err, body) {
     if (err) throw err;
-    var vt = vtfx.decode(body);
+    //var vt = vtfx.decode(body);
     //console.log("Tile: %j", vt.layers.length);
     var input_vt = new mapnik.VectorTile(maxz,xmaxz,ymaxz);
     input_vt.setData( body );
