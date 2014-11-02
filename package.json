@@ -1,0 +1,14 @@
+{
+    "name": "vtstat",
+    "dependencies": {
+        "request": "2.45.x",
+        "mbtiles":"0.6.1",
+        "vtfx": "https://github.com/mapbox/vtfx/tarball/orderby-unit-test",
+        "tile-cover":"1.0.0",
+        "mapnik": "3.0.5",
+        "flatten": "0.0.1",
+        "tilebelt": "0.6.0",
+        "tile-cover": "https://github.com/mapbox/tile-cover/tarball/tile-scanline-tilecoords"
+    },
+    "main": "index.js"
+}
