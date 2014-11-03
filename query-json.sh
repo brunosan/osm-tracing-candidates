@@ -99,18 +99,20 @@ psql -U postgres -c " \
 T="$(date +%s%N)"
 
 
-tilesfile="`pwd`/$tablename-$zoom.tiles"
-if [ -f $tilesfile ]; then
+tilesfile="`pwd`/$tablename-$zoom"
+if [ -f $tilesfile".tiles" ]; then
   echo -n "Using list of tiles..."  
 else
   echo -n "Creating list of tiles..." 
   ./tile-cover.js $geojson $zoom
+  sort -u $tilesfile".tmp" > $tilesfile".tiles"
+  rm $tilesfile".tmp"
 fi
 
-echo "done"
-echo `cat $tilesfile | wc -l` " tiles."
+echo "."
+echo `cat $tilesfile".tiles" | wc -l` " tiles."
 echo "Querying each tile"
-cat $tilesfile | xargs -L1 | parallel -X -n1 --ungroup "tile {} &"
+cat $tilesfile".tiles" | xargs -L1 | parallel -X -n1 --ungroup "tile {} &"
 wait $!
 wait
 
