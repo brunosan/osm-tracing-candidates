@@ -54,7 +54,7 @@ export url_post=".png?access_token="$MapboxAccessToken
 satsize(){
  #set -x 
  zxy=$1
- filesize=`curl -sI $url_pre$zxy$url_post | grep Content-Length | awk '{print $2}'`
+ filesize=`curl -k -sI $url_pre$zxy$url_post | grep Content-Length | awk '{print $2}'`
  echo $filesize
 }
 export -f satsize
