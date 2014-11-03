@@ -143,7 +143,7 @@ echo "EXPORT FILE to $tablename.csv"
 psql -U postgres -c "COPY $tablename TO '`pwd`/$tablename.csv' CSV HEADER;"
 cat `pwd`/$tablename.csv
 echo "Copying to S3"
-aws s3 cp `pwd`/$tablename.csv s3://mapbox-sandbox/temp/sat/
+[ "$AWSbucket" ] || aws s3 cp `pwd`/$tablename.csv $AWSbucket
 
 # Time interval in nanoseconds
 T="$(($(date +%s%N)-T))"
