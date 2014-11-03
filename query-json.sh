@@ -46,6 +46,7 @@ export -f ytilemid
 
 [ "$MapboxAccessToken" ] || (echo "MapboxAccessToken variable not set" 1>&2 ; exit 1)
 
+
 export url_pre="https://a.tiles.mapbox.com/v4/brunosan.satellite/"
 export url_post=".png?access_token="$MapboxAccessToken
 
