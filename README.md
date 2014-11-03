@@ -27,8 +27,14 @@ export AWSbucket="<BUCKET>"
 
 
 Create the ranking 
-```js
+```sh
 ./query-json.sh area.json zoom
+
+#if region is large, tmux it
+tmux
+./query-json.sh GI.geojson 16 &> log.out
+#detach with ctrl+b d
+tail -f log.out
 ```
 Process to create the scatter plots and list
 ```sh
