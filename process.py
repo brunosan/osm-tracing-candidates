@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[40]:
+# In[4]:
 
 #!/usr/bin/python
 import sys
@@ -29,7 +29,7 @@ print "First line: ",lines[1]
 
 
 
-# In[42]:
+# In[5]:
 
 
 plt.figure(figsize=(10,5))
@@ -54,16 +54,57 @@ print "Writting into:", csvname+'-scatter.png'
 plt.savefig(csvname+'-scatter.png')
 
 
-# In[44]:
+# In[33]:
 
-print np.percentile(rdelta,10)
-print np.percentile(10**osm,10)
-print np.percentile(sat,50)
+def display_places(places,num=100):
+   from IPython.display import Image
+   for place in places[0:num]:
+    print place
+    print 'http://a.tiles.mapbox.com/v3/brunosan.map-cyglrrfu/page.html#'+place[1]+'/'+place[4]+'/'+place[5]
+    display(Image(url='https://a.tiles.mapbox.com/v3/brunosan.map-cyglrrfu/'+place[0].strip()+'.png')) 
+
+
+# In[34]:
+
+#0 zxy,z,x,y,lat,lon, 6 osm,satellite,r_osm,r_satellite, 10 delta_rso,osm_timestamp,satellite_timestamp
+
+#Biggest satellite images with no tracing. Sorted by satellite size
+filtered=list([line for line in lines if 
+                 int(line[6])==0 ])
+sorted_osm=sorted(filtered,key=lambda x: int(x[7]),reverse=True)
+
+display_places(sorted_osm)
+
+
+# In[32]:
+
+#0 zxy,z,x,y,lat,lon, 6 osm,satellite,r_osm,r_satellite, 10 delta_rso,osm_timestamp,satellite_timestamp
+
+#Biggest satellite images with no tracing. Sorted by satellite size
+filtered=list([line for line in lines if 
+                 int(line[6])>0  and
+                 int(line[6])<10])
+sorted_osm=sorted(filtered,key=lambda x: int(x[7]),reverse=True)
+
+display_places(sorted_osm)
+
+
+# In[36]:
+
+#0 zxy,z,x,y,lat,lon, 6 osm,satellite,r_osm,r_satellite, 10 delta_rso,osm_timestamp,satellite_timestamp
+
+#Biggest satellite images with no tracing. Sorted by satellite size
+filtered=list([line for line in lines if 
+                 int(line[6])>10  and
+                 int(line[7])>15000])
+sorted_osm=sorted(filtered,key=lambda x: int(x[10]),reverse=True)
+
+display_places(sorted_osm)
 
 
 # In[64]:
 
-#0 zxy,z,x,y,lat,lon, 6 osm,satellite,r_osm,r_satellite, 10 delta_rso,osm_timestamp,satellite_timestamp
+
 
 toptracing=list([line for line in lines if 
                  int(line[10])<=np.percentile(rdelta,99) and 
