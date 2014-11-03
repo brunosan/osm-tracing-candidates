@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#Given a csv file with tile info, generate a valid jseon file with the properties
+#Given a csv file with tile info, generate a valid json file with the properties
 
 csv=$1
 zoom=$2
