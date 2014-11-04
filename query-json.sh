@@ -65,12 +65,12 @@ tile(){
   y=${input[1]}
   z=${input[2]}
   zxy="$z/$x/$y"
-  nodes=$(./live.js $zxy )
-  sat=$(satsize  $zxy) 
   lon=$(xtilemid $x $z) 
   lat=$(ytilemid $y $z) 
+  nodes=$(./live.js $zxy )
+  sat=$(satsize  $zxy) 
   psql -U postgres -c "INSERT INTO $tablename (zxy,z,x,y,lat,lon,osm,osm_timestamp,satellite,satellite_timestamp) VALUES ('$zxy',$z,$x,$y,$lat,$lon,$nodes,NOW(),$sat,NOW());" >> /dev/null
-  echo -n ",$zxy"
+  echo -n "$zxy: $nodes,$sat"
 }
 export -f tile
 
@@ -110,12 +110,12 @@ else
 fi
 
 echo "."
-echo `cat $tilesfile".tiles" | wc -l` " tiles."
+echo`cat $tilesfile".tiles" | wc -l` " tiles."
 echo "Querying each tile"
 cat $tilesfile".tiles" | xargs -L1 | parallel -X -n1 --ungroup "tile {} &"
 wait $!
 wait
-
+echo "."
 psql -U postgres -c "ALTER DATABASE postgres SET synchronous_commit TO ON;"
 psql -U postgres -c "COMMIT;"
 echo "Waiting 3xwal_writer_delay for async writes..."
