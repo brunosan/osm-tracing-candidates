@@ -13,7 +13,7 @@ xtile2long()
 {
  xtile=$1
  zoom=$2
- echo "${xtile} ${zoom}" | awk '{printf("%.9f", $1 / 2.0^$2 * 360.0 - 180)}'
+ echo "${xtile} ${zoom}" | awk '{printf("%.9f", $1 / 2.0^$2 * 360.0 - 180)}' | sed s/\\,/\\./g;
 } 
 export -f xtile2long
 
@@ -23,7 +23,7 @@ ytile2lat()
  zoom=$2;
  lat=`echo "${ytile} ${zoom}" | awk -v PI=3.14159265358979323846 '{ 
        num_tiles = PI - 2.0 * PI * $1 / 2.0^$2;
-       printf("%.9f", 180.0 / PI * atan2(0.5 * (exp(num_tiles) - exp(-num_tiles)),1)); }'`;
+       printf("%.9f", 180.0 / PI * atan2(0.5 * (exp(num_tiles) - exp(-num_tiles)),1)); }'| sed s/\\,/\\./g`;
  echo "${lat}";
 }
 export -f ytile2lat
