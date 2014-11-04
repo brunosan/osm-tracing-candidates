@@ -13,7 +13,7 @@ xtile2long()
 {
  xtile=$1
  zoom=$2
- echo "${xtile} ${zoom}" | awk '{printf("%.9f", $1 / 2.0^$2 * 360.0 - 180)}'
+ echo "${xtile} ${zoom}" | awk '{printf("%.9f", $1 / 2.0^$2 * 360.0 - 180)}' | sed s/\\,/\\./g;
 } 
 export -f xtile2long
 
@@ -23,7 +23,7 @@ ytile2lat()
  zoom=$2;
  lat=`echo "${ytile} ${zoom}" | awk -v PI=3.14159265358979323846 '{ 
        num_tiles = PI - 2.0 * PI * $1 / 2.0^$2;
-       printf("%.9f", 180.0 / PI * atan2(0.5 * (exp(num_tiles) - exp(-num_tiles)),1)); }'`;
+       printf("%.9f", 180.0 / PI * atan2(0.5 * (exp(num_tiles) - exp(-num_tiles)),1)); }'| sed s/\\,/\\./g`;
  echo "${lat}";
 }
 export -f ytile2lat
@@ -65,12 +65,12 @@ tile(){
   y=${input[1]}
   z=${input[2]}
   zxy="$z/$x/$y"
-  nodes=$(./live.js $zxy )
-  sat=$(satsize  $zxy) 
   lon=$(xtilemid $x $z) 
   lat=$(ytilemid $y $z) 
+  nodes=$(./live.js $zxy )
+  sat=$(satsize  $zxy) 
   psql -U postgres -c "INSERT INTO $tablename (zxy,z,x,y,lat,lon,osm,osm_timestamp,satellite,satellite_timestamp) VALUES ('$zxy',$z,$x,$y,$lat,$lon,$nodes,NOW(),$sat,NOW());" >> /dev/null
-  echo -n ",$zxy"
+  echo -n "$zxy: $nodes,$sat"
 }
 export -f tile
 
@@ -99,21 +99,21 @@ psql -U postgres -c " \
 T="$(date +%s%N)"
 
 
-tilesfile="`pwd`/$tablename-$zoom.tiles"
-if [ -f $tilesfile ]; then
+tilesfile="`pwd`/$tablename-$zoom"
+if [ -f $tilesfile".tiles" ]; then
   echo -n "Using list of tiles..."  
 else
   echo -n "Creating list of tiles..." 
   ./tile-cover.js $geojson $zoom
+  sort -u $tilesfile".tmp" > $tilesfile".tiles"
+  rm $tilesfile".tmp"
 fi
 
-echo "done"
-echo `cat $tilesfile | wc -l` " tiles."
+echo "."
+echo`cat $tilesfile".tiles" | wc -l` " tiles."
 echo "Querying each tile"
-cat $tilesfile | xargs -L1 | parallel -X -n1 --ungroup "tile {} &"
-wait $!
-wait
-
+cat $tilesfile".tiles" | xargs -L1 | parallel -X -n1 --ungroup "tile {} "
+echo "."
 psql -U postgres -c "ALTER DATABASE postgres SET synchronous_commit TO ON;"
 psql -U postgres -c "COMMIT;"
 echo "Waiting 3xwal_writer_delay for async writes..."

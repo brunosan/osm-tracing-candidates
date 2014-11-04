@@ -30,8 +30,8 @@ var maxz=14;
 
 xyz=[x,y,z]
 function getzmaxxy(xyz, maxz) {
-    if (xyz[2]-1 <= maxz){
-      return(tilebelt.getParent(xyz));
+    if (xyz[2]-1 < maxz){
+      return(xyz);
     } else {
       return getzmaxxy(tilebelt.getParent(xyz),maxz);   
     }           
@@ -41,13 +41,13 @@ var xmaxz=zmaxxyz[0];
 var ymaxz=zmaxxyz[1];
 var maxzxy=[maxz,xmaxz,ymaxz].join('/')
 
-//console.log('https://a.tiles.mapbox.com/v4/' + mapid + '/' + maxzxy + '.vector.pbf?access_token=' + process.env.MapboxAccessToken);
+//console.log(zmaxxyz,'https://a.tiles.mapbox.com/v4/' + mapid + '/' + maxzxy + '.vector.pbf?access_token=' + process.env.MapboxAccessToken);
 
 
 var total_nodes = 0;
 
 request({
-  uri: 'https://a.tiles.mapbox.com/v4/mapbox.mapbox-streets-v5/' + maxzxy + '.vector.pbf?access_token=' + process.env.MapboxAccessToken,
+  uri: 'https://a.tiles.mapbox.com/v4/'+mapid+'/' + maxzxy + '.vector.pbf?access_token=' + process.env.MapboxAccessToken,
   encoding: null
 }, function(err, res, zbody) {
   if (res.statusCode == '404') {
