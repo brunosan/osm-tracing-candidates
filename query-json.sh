@@ -112,7 +112,7 @@ fi
 echo "."
 echo `cat $tilesfile".tiles" | wc -l` " tiles."
 echo "Querying each tile"
-cat $tilesfile".tiles" | xargs -L1 | parallel -X -n1 --ungroup "tile {} "
+cat $tilesfile".tiles" | xargs -L1 | parallel --eta -X -n1 --ungroup "tile {} "
 echo "."
 psql -U postgres -c "ALTER DATABASE postgres SET synchronous_commit TO ON;"
 psql -U postgres -c "COMMIT;"
