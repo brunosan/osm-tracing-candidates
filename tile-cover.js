@@ -19,9 +19,10 @@ var file = fs.createWriteStream(process.argv[2].split('.')[0]+'-'+zoom+'.tmp');
 
 var number_tiles=0;
 json.features.forEach(function(region) {
-    //console.log(region.geometry);
+    
     tiles=cover.tiles(region.geometry, limits)
     file.on('error', function(err) { /* error handling */ });
+    console.log(tiles.length);
     number_tiles+=tiles.length;
     tiles.forEach(function(v) { file.write(v.join(',') + '\n'); });
     
