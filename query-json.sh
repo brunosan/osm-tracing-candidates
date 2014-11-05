@@ -110,7 +110,7 @@ else
 fi
 
 echo "."
-echo`cat $tilesfile".tiles" | wc -l` " tiles."
+echo `cat $tilesfile".tiles" | wc -l` " tiles."
 echo "Querying each tile"
 cat $tilesfile".tiles" | xargs -L1 | parallel -X -n1 --ungroup "tile {} "
 echo "."
@@ -120,17 +120,11 @@ echo "Waiting 3xwal_writer_delay for async writes..."
 sleep 2
 echo "all processed should have finsihed"
 echo "Adding OSM NODES rank column"
-psql -U postgres -c "UPDATE $tablename SET r_osm = rt.r_osm \
-       from ( \
-			    select zxy,osm,RANK() OVER (ORDER BY osm DESC) as r_osm from $tablename \
-			 ) as rt where $tablename.zxy=rt.zxy;"
+psql -U postgres -c "UPDATE $tablename SET r_osm = rt.r_osm from ( select zxy,osm,RANK() OVER (ORDER BY osm DESC) as r_osm from $tablename ) as rt where $tablename.zxy=rt.zxy;"
 
 #-----------
 echo "Adding satellite rank column"
-psql -U postgres -c "UPDATE $tablename SET r_satellite = rt.r_satellite \
-       from ( \
-          select zxy,satellite,RANK() OVER (ORDER BY satellite DESC) as r_satellite from $tablename \
-       ) as rt where $tablename.zxy=rt.zxy;"
+psql -U postgres -c "UPDATE $tablename SET r_satellite = rt.r_satellite from ( select zxy,satellite,RANK() OVER (ORDER BY satellite DESC) as r_satellite from $tablename  ) as rt where $tablename.zxy=rt.zxy;"
        
 echo "Calculating difference in ranking"
 psql -U postgres -c "UPDATE $tablename SET delta_rso = r_satellite-r_osm;"
@@ -141,10 +135,11 @@ psql -U postgres -c "UPDATE $tablename SET delta_rso = r_satellite-r_osm;"
 
 psql -U postgres -c "COMMIT;"
 echo "EXPORT FILE to $tablename.csv"
-psql -U postgres -c "COPY $tablename TO '`pwd`/$tablename.csv' CSV HEADER;"
-cat `pwd`/$tablename.csv
+chmod a+w `pwd`
+psql -U postgres -c "COPY $tablename TO '`pwd`/$tablename-$zoom.csv' CSV HEADER;"
+cat `pwd`/$tablename-$zoom.csv
 echo "Copying to S3"
-[ "$AWSbucket" ] || aws s3 cp `pwd`/$tablename.csv $AWSbucket
+[ "$AWSbucket" ] || aws s3 cp `pwd`/$tablename-$zoom.csv $AWSbucket
 
 # Time interval in nanoseconds
 T="$(($(date +%s%N)-T))"
