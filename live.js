@@ -67,11 +67,14 @@ request({
     output_vt.parse();
     //console.log(output_vt);
     try{
-      var data = output_vt.toGeoJSON(0);
-      for (var j = 0; j < data.features.length; j++) {
-        flat=flatten(data.features[j].geometry.coordinates);
-        total_nodes += flat.length;
-      } 
+      var layers = output_vt.toGeoJSON('__array__');
+      for (var i = 0; i < layers.length; i++) {
+        var layer = layers[i];
+        for (var j = 0; j < layer.features.length; j++) {
+          flat=flatten(layer.features[j].geometry.coordinates);
+          total_nodes += flat.length;
+        }
+      }
     } catch (e) {
       //console.log("emtpy");
       console.log('-1');
